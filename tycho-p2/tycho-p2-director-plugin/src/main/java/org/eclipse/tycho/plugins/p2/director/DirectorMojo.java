@@ -7,11 +7,11 @@
  *
  * Contributors:
  *     SAP AG - initial API and implementation
+ *     Compuware Corporation - refactoring to expose common methods now in AbstractDirectorMojo
  *******************************************************************************/
 package org.eclipse.tycho.plugins.p2.director;
 
 import java.io.File;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +28,7 @@ import org.eclipse.tycho.p2.tools.director.facade.DirectorApplicationWrapper;
  * @goal materialize-products
  */
 @SuppressWarnings("nls")
-public final class DirectorMojo extends AbstractProductMojo {
+public final class DirectorMojo extends AbstractDirectorMojo {
     /** @component */
     private EquinoxServiceFactory p2;
 
@@ -64,14 +64,9 @@ public final class DirectorMojo extends AbstractProductMojo {
 
                 String metadataRepositoryURLs = toCommaSeparatedList(sources.getMetadataRepositories());
                 String artifactRepositoryURLs = toCommaSeparatedList(sources.getArtifactRepositories());
-                String[] args = new String[] { "-metadatarepository", metadataRepositoryURLs, //
-                        "-artifactrepository", artifactRepositoryURLs, //
-                        "-installIU", product.getId(), //
-                        "-destination", destination.getAbsolutePath(), //
-                        "-profile", ProfileName.getNameForEnvironment(env, profileNames, profile), //
-                        "-profileProperties", "org.eclipse.update.install.features=" + String.valueOf(installFeatures), //
-                        "-roaming", //
-                        "-p2.os", env.getOs(), "-p2.ws", env.getWs(), "-p2.arch", env.getArch() };
+                String nameForEnvironment = ProfileName.getNameForEnvironment(env, profileNames, profile);
+                String[] args = getArgsForDirectorCall(product, env, destination, metadataRepositoryURLs,
+                        artifactRepositoryURLs, nameForEnvironment, installFeatures);
                 getLog().info("Calling director with arguments: " + Arrays.toString(args));
                 final Object result = director.run(args);
                 if (!DirectorApplicationWrapper.EXIT_OK.equals(result)) {
@@ -81,17 +76,4 @@ public final class DirectorMojo extends AbstractProductMojo {
         }
     }
 
-    private String toCommaSeparatedList(List<URI> repositories) {
-        if (repositories.size() == 0) {
-            return "";
-        }
-
-        StringBuilder result = new StringBuilder();
-        for (URI uri : repositories) {
-            result.append(uri.toString());
-            result.append(',');
-        }
-        result.setLength(result.length() - 1);
-        return result.toString();
-    }
 }
