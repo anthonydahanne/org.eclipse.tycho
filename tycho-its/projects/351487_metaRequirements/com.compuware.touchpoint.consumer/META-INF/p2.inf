@@ -1,0 +1,4 @@
+metaRequirements.0.namespace=com.compuware.p2
+metaRequirements.0.name=touchpoints
+metaRequirements.0.range=1.0
+instructions.configure=com.compuware.touchpoint.touchpoint();

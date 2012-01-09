@@ -48,6 +48,7 @@
 
 		<!-- non-Tycho bundles in the Tycho's OSGi runtime -->
 		<module>tycho-bundles-external</module>
+		<module>tycho-bundles-external-dynamic</module>
 	</modules>
 
 	<build>

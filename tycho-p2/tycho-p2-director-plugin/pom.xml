@@ -8,6 +8,7 @@
  -
  - Contributors:
  -    SAP AG - initial API and implementation
+ -    Compuware Corporation - added dependency to tycho-bundles-external-dynamic
  -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -45,6 +46,17 @@
 			<artifactId>tycho-testing-harness</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.tycho</groupId>
+			<artifactId>sisu-equinox-launching</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.tycho</groupId>
+			<artifactId>tycho-bundles-external-dynamic</artifactId>
+			<version>${project.version}</version>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 </project>

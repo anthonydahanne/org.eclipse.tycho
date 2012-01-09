@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.compuware</groupId>
+	<artifactId>com.compuware.touchpoint.product</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>eclipse-repository</packaging>
+	
+	<parent>
+		<groupId>com.compuware</groupId>
+		<artifactId>com.compuware.touchpoint.parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../com.compuware.touchpoint.parent</relativePath>
+	</parent>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-director-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<id>materialize-products-metarequirements</id>
+						<goals>
+							<goal>materialize-products-metarequirements</goal>
+						</goals>
+					</execution>
+					<!-- zipping is so slow... -->
+					<!-- execution>
+						<id>archive-products</id>
+						<goals>
+							<goal>archive-products</goal>
+						</goals>
+					</execution-->
+				</executions>
+				<configuration>
+					<products>
+						<product>
+							<id>touchpoint.product.id</id>
+							<attachId>client.product.attachId</attachId>
+							<rootFolder>client</rootFolder>
+						</product>
+					</products>
+					<argLine>-console -noExit</argLine>
+					<!-- argLine>-Dequinox.ds.print=true -Dorg.osgi.service.http.port=8080	-Dtoast.core.util.logLevel=DEBUG</argLine-->
+					<!-- bundleStartLevel>
+						<bundle>
+							<id>com.compuware.vantage.vsm.adaptors.provisioning.service</id>
+							<level>4</level>
+							<autoStart>true</autoStart>
+						</bundle>
+						<bundle>
+							<id>org.eclipse.equinox.ds</id>
+							<level>1</level>
+							<autoStart>true</autoStart>
+						</bundle>
+						<bundle>
+							<id>org.eclipse.equinox.p2.touchpoint.eclipse</id>
+							<level>4</level>
+							<autoStart>true</autoStart>
+						</bundle>
+						<bundle>
+							<id>org.eclipse.equinox.p2.touchpoint.natives</id>
+							<level>4</level>
+							<autoStart>true</autoStart>
+						</bundle>
+
+					</bundleStartLevel>
+					<dependencies>
+						<dependency>
+							<artifactId>org.eclipse.equinox.ds</artifactId>
+							<type>p2-installable-unit</type>
+						</dependency>
+						<dependency>
+							<artifactId>org.eclipse.equinox.p2.touchpoint.eclipse</artifactId>
+							<type>p2-installable-unit</type>
+						</dependency>
+						<dependency>
+							<artifactId>org.eclipse.equinox.p2.touchpoint.natives</artifactId>
+							<type>p2-installable-unit</type>
+						</dependency>
+					</dependencies-->
+					
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
