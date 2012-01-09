@@ -12,8 +12,6 @@ package org.eclipse.tycho.plugins.p2.director;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,12 +30,7 @@ import org.eclipse.sisu.equinox.launching.EquinoxLauncher;
 import org.eclipse.sisu.equinox.launching.internal.DefaultEquinoxInstallation;
 import org.eclipse.sisu.equinox.launching.internal.EquinoxLaunchConfiguration;
 import org.eclipse.tycho.core.TargetEnvironment;
-import org.eclipse.tycho.core.TargetPlatformConfiguration;
-import org.eclipse.tycho.core.utils.TychoProjectUtils;
 import org.eclipse.tycho.p2.facade.RepositoryReferenceTool;
-import org.eclipse.tycho.p2.resolver.TargetDefinitionFile;
-import org.eclipse.tycho.p2.target.facade.TargetDefinition.InstallableUnitLocation;
-import org.eclipse.tycho.p2.target.facade.TargetDefinition.Repository;
 import org.eclipse.tycho.p2.tools.RepositoryReferences;
 import org.eclipse.tycho.p2.tools.director.facade.DirectorApplicationWrapper;
 
@@ -103,35 +96,14 @@ public final class DynamicDirectorMojo extends AbstractDirectorMojo {
                 final DirectorApplicationWrapper director = new DynamicDirectorApplicationWrapper(
                         directorApplicationDir);
 
-//                int flags = RepositoryReferenceTool.REPOSITORIES_INCLUDE_CURRENT_MODULE;
-//                RepositoryReferences sources = repositoryReferenceTool.getVisibleRepositories(getProject(),
-//                        getSession(), flags);
-
                 File destination = getProductMaterializeDirectory(product, env);
                 String rootFolder = product.getRootFolder();
                 if (rootFolder != null && rootFolder.length() > 0) {
                     destination = new File(destination, rootFolder);
                 }
 
-                //finding out all the target platform locations
-                TargetPlatformConfiguration configuration = TychoProjectUtils
-                        .getTargetPlatformConfiguration(getProject());
-                String commaSeparatedP2ReposURIs = "";
                 String localP2Repository = "";
-                List<URI> p2ReposURIs = new ArrayList<URI>();
-                TargetDefinitionFile file;
                 try {
-                    file = TargetDefinitionFile.read(configuration.getTarget());
-                    @SuppressWarnings("unchecked")
-                    List<InstallableUnitLocation> locations = (List<InstallableUnitLocation>) file.getLocations();
-                    for (InstallableUnitLocation location : locations) {
-                        List<? extends Repository> repositories = location.getRepositories();
-                        for (Repository repository : repositories) {
-                            p2ReposURIs.add(repository.getLocation());
-                        }
-                    }
-                    commaSeparatedP2ReposURIs = toCommaSeparatedList(p2ReposURIs);
-                    //finding out the local repository location
                     File localP2RepositoryFile = new File(getBuildDirectory(), "repository");
                     localP2Repository = localP2RepositoryFile.getCanonicalPath();
                     localP2Repository = localP2Repository.replace("\\", "/");
@@ -140,13 +112,9 @@ public final class DynamicDirectorMojo extends AbstractDirectorMojo {
                     e.printStackTrace();
                 }
 
-                //yes, metadataRepositoryURLs and artifactRepositoryURLs are the same : they include the target platform locations
-                // + the local target/repository ; that should be enough to build the product
-                String metadataRepositoryURLs = commaSeparatedP2ReposURIs + "," + localP2Repository;
-                String artifactRepositoryURLs = metadataRepositoryURLs;
                 String nameForEnvironment = ProfileName.getNameForEnvironment(env, profileNames, profile);
-                String[] args = getArgsForDirectorCall(product, env, destination, metadataRepositoryURLs,
-                        artifactRepositoryURLs, nameForEnvironment, installFeatures);
+                String[] args = getArgsForDirectorCall(product, env, destination, localP2Repository, localP2Repository,
+                        nameForEnvironment, installFeatures);
                 getLog().info("Calling director with arguments: " + Arrays.toString(args));
                 final Object result = director.run(args);
                 if (!DirectorApplicationWrapper.EXIT_OK.equals(result)) {
