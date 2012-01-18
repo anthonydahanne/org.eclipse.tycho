@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
@@ -30,6 +31,8 @@ import org.eclipse.sisu.equinox.launching.EquinoxLauncher;
 import org.eclipse.sisu.equinox.launching.internal.DefaultEquinoxInstallation;
 import org.eclipse.sisu.equinox.launching.internal.EquinoxLaunchConfiguration;
 import org.eclipse.tycho.core.TargetEnvironment;
+import org.eclipse.tycho.core.TychoConstants;
+import org.eclipse.tycho.core.utils.PlatformPropertiesUtils;
 import org.eclipse.tycho.p2.facade.RepositoryReferenceTool;
 import org.eclipse.tycho.p2.tools.RepositoryReferences;
 import org.eclipse.tycho.p2.tools.director.facade.DirectorApplicationWrapper;
@@ -169,8 +172,13 @@ public final class DynamicDirectorMojo extends AbstractDirectorMojo {
         RepositoryReferences sources = repositoryReferenceTool
                 .getVisibleRepositories(getProject(), getSession(), flags);
 
-        // the env does not matter since we won't use native launchers
-        TargetEnvironment env = getEnvironments().get(0);
+        // the environment is the local environment since we're going to run the director from this env.
+        Properties properties = (Properties) getProject().getContextValue(TychoConstants.CTX_MERGED_PROPERTIES);
+        String os = PlatformPropertiesUtils.getOS(properties);
+        String ws = PlatformPropertiesUtils.getWS(properties);
+        String arch = PlatformPropertiesUtils.getArch(properties);
+
+        TargetEnvironment env = new TargetEnvironment(os, ws, arch, null /* nl */);
 
         //adding the repository containing the tycho-bundles-external-dynamic product
         String productRepository = null;
