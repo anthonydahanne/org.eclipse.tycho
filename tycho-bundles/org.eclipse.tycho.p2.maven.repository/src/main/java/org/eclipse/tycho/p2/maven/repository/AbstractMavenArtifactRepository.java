@@ -106,8 +106,12 @@ public abstract class AbstractMavenArtifactRepository extends AbstractArtifactRe
     public void addDescriptor(IArtifactDescriptor descriptor) {
         super.addDescriptor(descriptor);
         internalAddDescriptor(descriptor);
+        descriptorsChanged();
     }
 
+    /**
+     * Adds a descriptor without triggering {@link #descriptorsChanged()}.
+     */
     protected final void internalAddDescriptor(IArtifactDescriptor descriptor) {
         descriptors.add(descriptor);
 
@@ -122,14 +126,26 @@ public abstract class AbstractMavenArtifactRepository extends AbstractArtifactRe
         descriptorsForKey.add(descriptor);
     }
 
-    // TODO shouldn't this be implemented in the super class from p2?
+    protected final void descriptorsChanged() {
+        // TODO check if store is disabled
+        store();
+    }
+
+    /**
+     * Called whenever the list of descriptors needs to be persisted.
+     */
+    protected void store() {
+        // TODO split this class in writable and non-writable repos to avoid empty implementation
+    }
+
     @Override
     public void addDescriptors(IArtifactDescriptor[] descriptors) {
         super.addDescriptors(descriptors);
 
         for (IArtifactDescriptor descriptor : descriptors) {
-            addDescriptor(descriptor);
+            internalAddDescriptor(descriptor);
         }
+        descriptorsChanged();
     }
 
     GAV getGAV(IArtifactDescriptor descriptor) {
@@ -206,7 +222,7 @@ public abstract class AbstractMavenArtifactRepository extends AbstractArtifactRe
 
     public File getArtifactFile(IArtifactKey key) {
         Set<IArtifactDescriptor> descriptors = descriptorsMap.get(key);
-        if (descriptors.isEmpty())
+        if (descriptors == null || descriptors.isEmpty())
             return null;
         else {
             // TODO determine which one is the raw artifact, i.e. not the pack200 artifact 
